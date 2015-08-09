@@ -21,6 +21,7 @@ public class Utils {
             array[i] = lastElement;
     }
 
+    //TODO porque esta en Utils?
     public static function getDefinitionByType(type:String):Object{
         var result:Object = new Object();
         switch(type){
@@ -38,7 +39,7 @@ public class Utils {
                 result.aoe = 0;
                 result.radius = 10;
                 result.maxUnits = 0;
-                result.asset = "d";
+                result.asset = "base";
                 result.scaleX = 1;
                 result.scaleY = 1;
                 result.attackCooldown = 0;
@@ -55,15 +56,15 @@ public class Utils {
             case "main":
                 result = getDefinitionByType("building");
                 result.hp = 10000;
-                result.scaleX = 1.5;
-                result.scaleY = 1.5;
+                result.scaleX = 1;
+                result.scaleY = 1;
                 result.income = 10;
                 result.cost = 0;
                 break;
             case "tower":
                 result = getDefinitionByType("building");
                 result.attackCooldown = 1000;
-                result.asset = "c";
+                result.asset = "tower";
                 result.aoe = 25;
                 result.cost = 10;
                 result.damage = 75;
@@ -71,55 +72,57 @@ public class Utils {
                 break;
             case "resource":
                 result = getDefinitionByType("building");
-                result.asset = "d";
+                result.asset = "resource";
                 result.income = 5;
+                result.cost = 10;
                 break;
             case "spawner":
                 result = getDefinitionByType("building");
                 result.hasPath = true;
                 break;
-            case "unitSpawner":
+            case "melee1":
                 result = getDefinitionByType("spawner");
-                result.actions.push("summonUnit");
-                result.asset = "u1";
+                result.actions.push("summon_melee2");
+                result.asset = "melee1";
                 break;
-            case "fastUnitSpawner":
+            case "melee2":
                 result = getDefinitionByType("spawner");
-                result.actions.push("summonFastUnit");
-                result.asset = "u2";
+                result.actions.push("summon_melee2");
+                result.asset = "melee2";
                 result.cost = 7;
                 break;
-            case "rangedUnitSpawner":
+            case "ranged1":
                 result = getDefinitionByType("spawner");
-                result.actions.push("summonRangedUnit");
-                result.asset = "u3";
+                result.actions.push("summonR_ranged1");
+                result.asset = "ranged1";
                 result.cost = 15;
                 break;
-            case "strongRangedUnitSpawner":
+            case "ranged2":
                 result = getDefinitionByType("spawner");
-                result.actions.push("summonStrongRangedUnit");
-                result.asset = "u4";
+                result.actions.push("summon_ranged2");
+                result.asset = "ranged2";
                 result.cost = 30;
                 break;
-            case "aoeUnitSpawner":
+            case "ranged3":
                 result = getDefinitionByType("spawner");
-                result.actions.push("summonAoeUnit");
-                result.asset = "u5";
+                result.actions.push("summon_ranged3");
+                result.asset = "ranged3";
                 result.cost = 25;
                 break;
-            case "heavyUnitSpawner":
+            case "melee3":
                 result = getDefinitionByType("spawner");
-                result.actions.push("summonHeavyUnit");
-                result.asset = "u6";
+                result.actions.push("summon_melee3");
+                result.asset = "melee3";
                 result.cost = 20;
                 break;
-            case "knightSpawner":
+            case "melee4":
                 result = getDefinitionByType("spawner");
-                result.actions.push("summonKnight");
-                result.asset = "u7";
+                result.actions.push("summon_melee4");
+                result.asset = "melee4";
                 result.cost = 40;
                 break;
-            case "action":
+          //TODO: porque por triplicado?
+          /*  case "action":
                 result = getDefinitionByType("base");
                 result.entityType = "action";
                 result.cooldown = 0;
@@ -205,7 +208,7 @@ public class Utils {
                 result = getDefinitionByType("heavyUnit");
                 result.damage = 150;
                 result.asset = "u7";
-                break;
+                break;*/
         }
         return result;
     }

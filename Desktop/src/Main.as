@@ -81,7 +81,7 @@ public class Main extends Sprite
     {
         // Add background image. By using "loadBytes", we can avoid any flickering.
 
-        var bgPath:String = formatString("assets/{0}x/splash.png", scaleFactor);
+        var bgPath:String = formatString("assets/{0}x/common/splash.png", scaleFactor);
         var bgFile:File = File.applicationDirectory.resolvePath(bgPath);
         var bytes:ByteArray = new ByteArray();
         var stream:FileStream = new FileStream();

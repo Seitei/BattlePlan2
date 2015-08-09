@@ -8,6 +8,7 @@ import flash.events.TimerEvent;
 import flash.filters.BitmapFilterQuality;
 import flash.filters.BlurFilter;
 import flash.geom.Point;
+import flash.ui.Keyboard;
 
 import game.Action;
 import game.Behavior;
@@ -28,6 +29,10 @@ import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 import starling.textures.Texture;
 import starling.utils.AssetManager;
+
+import ui.Tile;
+
+import ui.UI;
 
 import utils.CustomTimer;
 import utils.StateMachine;
@@ -53,7 +58,7 @@ public class GameApp extends starling.display.Sprite {
 
     public var logicCounter:int = 0;
 
-    public var players:Array = new Array();
+    private var _players:Array = new Array();
     public var units:Vector.<Vector.<UnitView>> = new Vector.<Vector.<UnitView>>();
     public var uiElements:Vector.<UIElementView> = new <UIElementView>[];
     public var stateMachine:StateMachine = new StateMachine();
@@ -74,8 +79,9 @@ public class GameApp extends starling.display.Sprite {
     public var pressedKeys:Array = new Array(200);
     public var mousePos:Point = new Point();
     public var mousePressed:Boolean = false;
-    private var _assets:AssetManager;
+    private static var _assets:AssetManager;
     private var _instance:GameApp;
+    private var _ui:UI;
 
     public function GameApp(params:Object) {
 
@@ -84,6 +90,19 @@ public class GameApp extends starling.display.Sprite {
         _instance = this;
 
         init();
+
+    }
+
+    //TODO cambiar, vos solo tenes un player.
+    public function getGold():int {
+
+        return _players[0].gold;
+
+    }
+
+    public static function getAssetManager():AssetManager{
+
+        return _assets;
 
     }
 
@@ -128,8 +147,6 @@ public class GameApp extends starling.display.Sprite {
     private function onAddedToStage(e:Event):void{
 
         instance = this;
-
-        //atlas = DynamicAtlas.fromClassVector(assetClasses);
         lineBmpd = new BitmapData(STAGE_WIDTH, STAGE_HEIGHT, true, 0x0);
 
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
@@ -144,6 +161,17 @@ public class GameApp extends starling.display.Sprite {
         addChild(placeBuildingLayer);
         addChild(menuLayer);
 
+    }
+
+    //TODO: como se cual es el player mio?.
+    private function onBuildingSelected(e:Event, building:String):void {
+
+        _players[0].setBuildingSelected(building);
+
+    }
+
+    public function getPlayers():Array{
+        return _players;
     }
 
     public function moveMouse(x:Number, y:Number):void{
@@ -190,7 +218,7 @@ public class GameApp extends starling.display.Sprite {
 
     private function onIngameTimerComplete(e:TimerEvent):void{
 
-        for each(var player:Player in players){
+        for each(var player:Player in _players){
             for each(var unitView:UnitView in units[player.team]) {
                 player.gold += unitView.owner.income;
             }
@@ -218,6 +246,19 @@ public class GameApp extends starling.display.Sprite {
 
     private function onEnterFrame(e:Event):void{
 
+        if(GameApp.instance.pressedKeys[Keyboard.SHIFT]) {
+            GameApp.instance.releaseKey(Keyboard.SHIFT);
+
+            if(_ui.showing() == true){
+                _ui.hide();
+            }
+            else {
+                _ui.show();
+            }
+
+        }
+
+        //TODO player gold? cual es el mio?
         switch(stateMachine.state){
             case "test":
                 test();
@@ -246,17 +287,18 @@ public class GameApp extends starling.display.Sprite {
                 var player1:Player = new Player();
                 player1.team = 0;
                 player1.type = "a";
-                player1.hud = createUIElement(STAGE_WIDTH - 101, 1, 100, 50, 0x55555555, "gold: 0", null, placeBuildingLayer);
+                player1.hud = createUIElement(STAGE_WIDTH - 101, STAGE_HEIGHT - 51, 100, 50, 0x55555555, "gold: 0", null, placeBuildingLayer);
                 player1.gold = 10;
-                players.push(player1);
+                _players.push(player1);
                 units[player1.team] = new Vector.<UnitView>();
 
                 var player2:Player = new Player();
                 player2.team = 1;
                 player2.type = "b";
                 player2.hud = createUIElement(1, STAGE_HEIGHT - 51, 100, 50, 0x55555555, "gold: 0", null, placeBuildingLayer);
+
                 player2.gold = 10;
-                players.push(player2);
+                _players.push(player2);
                 units[player2.team] = new Vector.<UnitView>();
 
                 player1.enemyPlayer = player2;
@@ -265,12 +307,12 @@ public class GameApp extends starling.display.Sprite {
 
                 switch(ORIENTATION){
                     case "topDown":
-                        createBuilding(STAGE_WIDTH / 2, 60, "main", player1);
-                        createBuilding(STAGE_WIDTH / 2, STAGE_HEIGHT - 60, "main", player2);
+                        createBuilding(STAGE_WIDTH / 2, 30, "main", player1);
+                        createBuilding(STAGE_WIDTH / 2, STAGE_HEIGHT - 30, "main", player2);
                         break;
                     case "leftRight":
-                        createBuilding(60, STAGE_HEIGHT / 2, "main", player1);
-                        createBuilding(STAGE_WIDTH - 60, STAGE_HEIGHT / 2, "main", player2);
+                        createBuilding(30, STAGE_HEIGHT / 2, "main", player1);
+                        createBuilding(STAGE_WIDTH - 30, STAGE_HEIGHT / 2, "main", player2);
                         break;
                 }
 
@@ -284,12 +326,15 @@ public class GameApp extends starling.display.Sprite {
                     player2.npc = NPC_OPONENT;
                 }
 
+                createUI();
+
                 stateMachine.dispatchEvent("complete");
                 break;
 
+            //TODO default case se usualmente se usa para catchear errores.
             default:
 
-                for each(var player:Player in players){
+                for each(var player:Player in _players){
                     var newText:String = "gold: " + player.gold.toString();
                     if(newText != player.hud.textField.text) {
                         player.hud.textField.text = newText;
@@ -363,7 +408,8 @@ public class GameApp extends starling.display.Sprite {
                             }
                         }
                     }
-                    for each(var player_2:Player in players) {
+                    //TODO: porque se llama player 2??
+                    for each(var player_2:Player in _players) {
                         player_2.update();
                     }
                     if (stateMachine.state == "ingame") {
@@ -497,6 +543,14 @@ public class GameApp extends starling.display.Sprite {
         return elementView;
     }
 
+    private function createUI():void{
+
+        _ui = new UI();
+        addChild(_ui);
+        addEventListener("buildingSelected", onBuildingSelected);
+
+    }
+
     private function getLayerByEntityType(entityType:String):starling.display.Sprite {
 
         switch(entityType){
@@ -508,10 +562,16 @@ public class GameApp extends starling.display.Sprite {
         return null;
     }
 
+    //TODO esto crea buildings nomas o todo?
     public function createBuilding(x:Number, y:Number, type:String, player:Player, parent:Unit = null):UnitView{
 
         var data:Object = Utils.getDefinitionByType(type);
         var layer:starling.display.Sprite;
+
+        if(data.entityType == "building"){
+            data.asset = data.asset + "_bld";
+        }
+
         var unitImg:starling.display.Sprite = getUnitImageByType(type, player, data);
         var unit:Unit = new Unit();
         var unitView:UnitView = new UnitView(unit, unitImg);

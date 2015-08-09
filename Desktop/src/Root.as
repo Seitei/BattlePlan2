@@ -9,7 +9,8 @@ import starling.utils.AssetManager;
  *  switching between game and menu. For this, it listens to "START_GAME" and "GAME_OVER"
  *  events fired by the Menu and Game classes. Keep this class rather lightweight: it
  *  controls the high level behaviour of your game. */
-public class Root extends Sprite
+
+  public class Root extends Sprite
 {
     private static var _assets:AssetManager;
 

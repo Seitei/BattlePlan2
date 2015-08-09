@@ -42,6 +42,10 @@ public class Unit {
 
     private var _mode:String;
 
+    public function Unit() {
+
+    }
+
     protected function getParentMode():String{
         if(!_mode){
             if(parent) {
@@ -75,9 +79,6 @@ public class Unit {
     public function removeChild(unit:Unit):void{
         Utils.deleteUnit(children, children.indexOf(unit));
         unit.parent = null;
-    }
-
-    public function Unit() {
     }
 
     public function init():void{
@@ -139,7 +140,9 @@ public class Unit {
 
         return newPath;
     }
+
     public function buildPointsByCounts(counts:Array):Array{
+
         var result:Array = new Array();
         var sep:Number = 20;
         var sepY:Number = 10;
